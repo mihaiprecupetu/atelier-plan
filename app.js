@@ -11,6 +11,8 @@ const toolButtons = [...document.querySelectorAll('button[data-tool]')];
 const propertyPanel = document.querySelector('#properties');
 const fileInput = document.querySelector('#project-file');
 const toast = document.querySelector('#toast');
+const themeToggle = document.querySelector('#theme-toggle');
+const themeColor = document.querySelector('#theme-color');
 
 let project = createProject();
 let activeTool = 'select';
@@ -106,6 +108,33 @@ function showToast(message) {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('visible'), 2600);
 }
+
+function setTheme(theme) {
+    const isDark = theme === 'dark';
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    themeToggle.textContent = isDark ? 'Light mode' : 'Dark mode';
+    themeToggle.setAttribute('aria-label', `Switch to ${isDark ? 'light' : 'dark'} mode`);
+    themeToggle.setAttribute('aria-pressed', String(isDark));
+    themeColor.content = isDark ? '#171b19' : '#f3f4ef';
+}
+
+let savedTheme = 'light';
+try {
+    savedTheme = localStorage.getItem('atelier-plan-theme') === 'dark' ? 'dark' : 'light';
+} catch (error) {
+    showToast('The saved appearance preference could not be loaded.');
+}
+setTheme(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+    const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try {
+        localStorage.setItem('atelier-plan-theme', theme);
+    } catch (error) {
+        showToast('Theme changed, but the browser could not save your preference.');
+    }
+});
 
 function formatLength(mm) {
     const metres = mm / 1000;

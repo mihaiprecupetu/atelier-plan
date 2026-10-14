@@ -6,6 +6,8 @@ Atelier Plan is a browser-based 2D floor-plan editor for building architects. Dr
 
 Open `index.html` in a current desktop browser. The app is static and has no build or install step. Internet access is only used to load optional DM Sans and DM Mono fonts; system fallbacks are provided.
 
+Use the **Dark mode** button in the project toolbar to switch appearance. The choice is saved in this browser.
+
 ## Workflow
 
 1. Enter a project name and choose a drawing tool from the left rail.

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f3f4ef">
+    <meta name="theme-color" content="#f3f4ef" id="theme-color">
     <meta name="description" content="A precise, browser-based 2D building plan editor.">
     <title>Atelier Plan | Building Plan Editor</title>
     <link rel="stylesheet" href="styles.css">
@@ -25,6 +25,7 @@
             <nav class="document-actions" aria-label="Project actions">
                 <button class="quiet-button" id="new-project" type="button">New</button>
                 <button class="quiet-button" id="open-project" type="button">Open</button>
+                <button class="quiet-button" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">Dark mode</button>
                 <button class="quiet-button" id="save-project" type="button">Download project</button>
                 <button class="primary-button" id="print-project" type="button">Print / PDF</button>
                 <input id="project-file" type="file" accept=".json,.plan.json,application/json" hidden>

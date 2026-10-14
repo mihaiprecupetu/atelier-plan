@@ -23,6 +23,7 @@ The primary user is a building architect preparing a schematic or early floor-pl
 - Move selected objects by dragging or setting their center coordinates. Rotate in 90° increments, uniformly scale from 1% to 1000%, duplicate, and mirror horizontally or vertically. A “Keep original when transforming” toggle applies rotate/scale/mirror to a copy; **Copy object** always duplicates.
 - Metric millimetre geometry, independent origin-grid and object snapping, optional 90° wall constraint, grid visibility, zoom (including two-finger pinch zoom on touch devices), pan, fit-to-plan, undo, redo, deletion, project naming, file download/open, and browser print-to-PDF.
 - A responsive interface with labeled controls, visible focus, keyboard shortcuts, and a narrow-screen layout.
+- A light/dark appearance toggle that persists the user's choice in the browser and keeps drawing geometry, controls, and cursors legible.
 - Surface hit regions scale with the view so visible wall thicknesses, dimension lines, opening symbols, and text can be selected without clicking only a centerline.
 
 ### Not Included
@@ -70,3 +71,4 @@ The print action creates a vector plan sheet for the browser print dialog. The i
 5. Invalid, malformed, oversized, or unsupported project data is rejected without discarding the current project.
 6. Print output includes the plan and project metadata, fits the plan without clipping, and states that it is not to scale.
 7. Core controls can be operated by keyboard, and layout remains usable on a narrow viewport.
+8. Light and dark appearance modes keep interface controls, drawing objects, and cursor states visible; switching modes updates the browser theme color and persists across reloads.

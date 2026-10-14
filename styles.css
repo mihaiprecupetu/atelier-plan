@@ -1488,3 +1488,252 @@
             font-size: 10px;
         }
     }
+
+    :root[data-theme="dark"] {
+        color-scheme: dark;
+        --paper: #171b19;
+        --surface: #202623;
+        --canvas: #111614;
+        --ink: #e5eae4;
+        --muted: #a4afa5;
+        --line: #343d37;
+        --line-dark: #4b574f;
+        --accent-deep: #c6ef54;
+        --brick: #ee8a73;
+    }
+
+    :root[data-theme="dark"] .tool-rail,
+    :root[data-theme="dark"] .inspector {
+        background: #1b211e;
+    }
+
+    :root[data-theme="dark"] .brand-mark {
+        color: #20251f;
+    }
+
+    :root[data-theme="dark"] .primary-button:hover {
+        background: #d4f27a;
+    }
+
+    :root[data-theme="dark"] .primary-button {
+        background: #c6ef54;
+        color: #20251f;
+    }
+
+    :root[data-theme="dark"] .tool-button {
+        color: #c5cec6;
+    }
+
+    :root[data-theme="dark"] .tool-button:hover,
+    :root[data-theme="dark"] .fit-button:hover,
+    :root[data-theme="dark"] .secondary-button:hover,
+    :root[data-theme="dark"] .finish-room-button:hover {
+        background: #303a33;
+    }
+
+    :root[data-theme="dark"] .tool-button.active {
+        border-color: #526b32;
+        background: #303e26;
+        color: #e5f2cf;
+    }
+
+    :root[data-theme="dark"] .tool-glyph,
+    :root[data-theme="dark"] .icon-button,
+    :root[data-theme="dark"] .layer-icon-button {
+        color: #c2ccc3;
+    }
+
+    :root[data-theme="dark"] .tool-button.active .tool-glyph {
+        color: #d2f182;
+    }
+
+    :root[data-theme="dark"] .rail-index,
+    :root[data-theme="dark"] kbd {
+        color: #8f9a90;
+    }
+
+    :root[data-theme="dark"] .delete-tool {
+        color: #e0a297;
+    }
+
+    :root[data-theme="dark"] .view-divider {
+        color: #677169;
+    }
+
+    :root[data-theme="dark"] .snap-control,
+    :root[data-theme="dark"] .grid-control,
+    :root[data-theme="dark"] .wall-length-control,
+    :root[data-theme="dark"] .property-field,
+    :root[data-theme="dark"] .copy-toggle {
+        color: #b2bcb3;
+    }
+
+    :root[data-theme="dark"] .grid-control input,
+    :root[data-theme="dark"] .grid-control select,
+    :root[data-theme="dark"] .property-field input,
+    :root[data-theme="dark"] .property-field textarea,
+    :root[data-theme="dark"] .wall-length-control input {
+        border-color: var(--line-dark);
+        background: #252c28;
+        color: var(--ink);
+    }
+
+    :root[data-theme="dark"] .property-field input[readonly] {
+        background: #202622;
+        color: #a6b0a7;
+    }
+
+    :root[data-theme="dark"] .secondary-button {
+        border-color: var(--line-dark);
+        background: #252c28;
+        color: #dce5dc;
+    }
+
+    :root[data-theme="dark"] .finish-room-button {
+        border-color: #637b3a;
+        background: #303e26;
+        color: #e5f2cf;
+    }
+
+    :root[data-theme="dark"] .stage {
+        background-color: var(--canvas);
+    }
+
+    :root[data-theme="dark"] .stage .grid-dot {
+        fill: #39443d;
+    }
+
+    :root[data-theme="dark"] .stage .wall-line {
+        stroke: #d3ddd5;
+    }
+
+    :root[data-theme="dark"] .stage .wall-measure {
+        fill: #bdc9c0;
+    }
+
+    :root[data-theme="dark"] .stage .door-leaf,
+    :root[data-theme="dark"] .stage .door-arc {
+        stroke: #f0997f;
+    }
+
+    :root[data-theme="dark"] .stage .window-line {
+        stroke: #83c9ed;
+    }
+
+    :root[data-theme="dark"] .stage .room-shape {
+        fill: #94b85f;
+        fill-opacity: 0.16;
+        stroke: #b4d17a;
+    }
+
+    :root[data-theme="dark"] .stage .room-name {
+        fill: #dae8cf;
+    }
+
+    :root[data-theme="dark"] .stage .room-area {
+        fill: #b5c0ae;
+    }
+
+    :root[data-theme="dark"] .stage .dimension-extension,
+    :root[data-theme="dark"] .stage .dimension-line {
+        stroke: #9acbeb;
+    }
+
+    :root[data-theme="dark"] .stage .dimension-label {
+        fill: #a9d6f0;
+    }
+
+    :root[data-theme="dark"] .stage .is-selected .wall-line,
+    :root[data-theme="dark"] .stage .is-selected .room-shape {
+        stroke: #c6ef54;
+    }
+
+    :root[data-theme="dark"] .stage .is-selected .dimension-line,
+    :root[data-theme="dark"] .stage .is-selected .dimension-extension {
+        stroke: #ffad8e;
+    }
+
+    :root[data-theme="dark"] .stage .wall-preview,
+    :root[data-theme="dark"] .stage .room-preview {
+        stroke: #c6ef54;
+    }
+
+    :root[data-theme="dark"] .stage .dimension-preview {
+        stroke: #9acbeb;
+    }
+
+    :root[data-theme="dark"] .stage .selection-window {
+        fill: rgb(131 201 237 / 15%);
+        stroke: #83c9ed;
+    }
+
+    :root[data-theme="dark"] .stage .selection-crossing {
+        fill: rgb(240 138 115 / 13%);
+        stroke: #ee8a73;
+    }
+
+    :root[data-theme="dark"] .stage .object-snap-marker {
+        fill: rgb(198 239 84 / 75%);
+        stroke: #20251f;
+    }
+
+    :root[data-theme="dark"] .stage .plan-text {
+        fill: #e0e7df;
+    }
+
+    :root[data-theme="dark"] .zoom-controls {
+        background: rgb(32 38 35 / 96%);
+        box-shadow: 0 3px 12px rgb(0 0 0 / 24%);
+    }
+
+    :root[data-theme="dark"] .zoom-controls>span {
+        color: #c5cec6;
+    }
+
+    :root[data-theme="dark"] .empty-state {
+        color: #a4afa5;
+    }
+
+    :root[data-theme="dark"] .empty-cross {
+        border-color: #687a4f;
+        color: #c6ef54;
+    }
+
+    :root[data-theme="dark"] .empty-properties {
+        color: #a4afa5;
+    }
+
+    :root[data-theme="dark"] .danger-button {
+        border-color: #71483f;
+        background: #292321;
+        color: #f09b86;
+    }
+
+    :root[data-theme="dark"] .danger-button:hover {
+        background: #3a2925;
+    }
+
+    :root[data-theme="dark"] .project-note p {
+        color: #a4afa5;
+    }
+
+    :root[data-theme="dark"] .project-note strong {
+        color: #d4ddd3;
+    }
+
+    :root[data-theme="dark"] .tool-instructions {
+        border-color: #3d4941;
+        background: rgb(32 38 35 / 96%);
+        color: #c5cec6;
+        box-shadow: 0 2px 8px rgb(0 0 0 / 24%);
+    }
+
+    :root[data-theme="dark"] .layer-row.active {
+        border-color: #526b32;
+        background: #303e26;
+    }
+
+    :root[data-theme="dark"] .layer-activate:hover,
+    :root[data-theme="dark"] .layer-icon-button:hover:not(:disabled) {
+        background: rgb(229 234 228 / 10%);
+    }
