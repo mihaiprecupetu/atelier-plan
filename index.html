@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f4ef">
+    <meta name="description" content="A precise, browser-based 2D building plan editor.">
+    <title>Atelier Plan | Building Plan Editor</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+    <main class="app-shell">
+        <header class="topbar">
+            <a class="brand" href="./" aria-label="Atelier Plan home">
+                <span class="brand-mark" aria-hidden="true">A</span>
+                <span class="brand-name">ATELIER <b>PLAN</b></span>
+            </a>
+            <div class="document-title">
+                <span class="eyebrow">WORKING DRAWING</span>
+                <input id="project-name" aria-label="Project name" value="Untitled plan" maxlength="120">
+            </div>
+            <nav class="document-actions" aria-label="Project actions">
+                <button class="quiet-button" id="new-project" type="button">New</button>
+                <button class="quiet-button" id="open-project" type="button">Open</button>
+                <button class="quiet-button" id="save-project" type="button">Download project</button>
+                <button class="primary-button" id="print-project" type="button">Print / PDF</button>
+                <input id="project-file" type="file" accept=".json,.plan.json,application/json" hidden>
+            </nav>
+        </header>
+
+        <section class="workspace" aria-label="Plan editor">
+            <aside class="tool-rail" aria-label="Drawing tools">
+                <div class="rail-heading"><span>TOOLS</span><span class="rail-index">01</span></div>
+                <div class="tool-list" role="toolbar" aria-label="Drawing tools">
+                    <button class="tool-button active" type="button" data-tool="select" aria-pressed="true" title="Select and move (V)"><span class="tool-glyph">↖</span><span>Select</span><kbd>V</kbd></button>
+                    <button class="tool-button" type="button" data-tool="area-select" aria-pressed="false" title="Drag to select multiple objects (A)"><span class="tool-glyph">▧</span><span>Area select</span><kbd>A</kbd></button>
+                    <button class="tool-button" type="button" data-tool="wall" aria-pressed="false" title="Draw wall (W)"><span class="tool-glyph">╱</span><span>Wall</span><kbd>W</kbd></button>
+                    <button class="tool-button" type="button" data-tool="door" aria-pressed="false" title="Place door (D)"><span class="tool-glyph">◜</span><span>Door</span><kbd>D</kbd></button>
+                    <button class="tool-button" type="button" data-tool="window" aria-pressed="false" title="Place window"><span class="tool-glyph">▥</span><span>Window</span><kbd></kbd></button>
+                    <button class="tool-button" type="button" data-tool="room" aria-pressed="false" title="Draw room boundary (R)"><span class="tool-glyph">□</span><span>Room</span><kbd>R</kbd></button>
+                    <button class="tool-button" type="button" data-tool="dimension" aria-pressed="false" title="Add dimension (M)"><span class="tool-glyph">↔</span><span>Dimension</span><kbd>M</kbd></button>
+                    <button class="tool-button" type="button" data-tool="text" aria-pressed="false" title="Place text (T)"><span class="tool-glyph">T</span><span>Text</span><kbd>T</kbd></button>
+                </div>
+                <div class="rail-separator"></div>
+                <button class="tool-button delete-tool" id="delete-object" type="button" title="Delete selected object"><span class="tool-glyph">×</span><span>Delete</span><kbd>Del</kbd></button>
+                <div class="rail-foot"><span class="status-dot"></span><span>LOCAL PROJECT</span></div>
+            </aside>
+
+            <section class="drawing-area" aria-label="Drawing workspace">
+                <div class="canvas-toolbar">
+                    <div class="view-label"><span class="view-marker"></span><span>Floor plan</span><span class="view-divider">/</span><span class="muted-label">Level 01</span></div>
+                    <div class="canvas-controls">
+                        <button class="icon-button" id="undo" type="button" aria-label="Undo" title="Undo (Ctrl+Z)" disabled>↶</button>
+                        <button class="icon-button" id="redo" type="button" aria-label="Redo" title="Redo (Ctrl+Y)" disabled>↷</button>
+                        <span class="control-divider"></span>
+                        <label class="snap-control"><input id="snap-toggle" type="checkbox" checked><span>Grid</span></label>
+                        <label class="snap-control" title="Snap to existing object points"><input id="object-snap-toggle" type="checkbox" checked><span>Objects</span></label>
+                        <label class="snap-control" title="Constrain new walls to horizontal or vertical"><input id="orthogonal-toggle" type="checkbox"><span>90°</span></label>
+                        <label class="grid-control" for="snap-step"><span>mm</span><input id="snap-step" type="number" min="1" max="10000" step="1" value="1" aria-label="Snap increment in millimetres"></label>
+                    </div>
+                </div>
+                <div class="stage" id="stage">
+                    <svg id="plan-canvas" viewBox="-500 -350 7000 4800" role="img" aria-label="Floor plan drawing canvas" data-tool="select">
+                        <defs><pattern id="grid-pattern" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r="10" class="grid-dot"></circle></pattern></defs>
+						<rect id="grid-fill" x="-100000" y="-100000" width="200000" height="200000" fill="url(#grid-pattern)"></rect>
+						<g id="entities"></g>
+						<g id="preview"></g>
+					</svg>
+                    <div class="tool-instructions" id="tool-instructions" role="status" aria-live="polite">
+                        <span id="tool-instruction-text">Select and move objects</span>
+                        <label class="wall-length-control" id="wall-length-control" hidden>Length (mm)
+                            <input id="wall-length-input" type="number" min="10" step="1" inputmode="numeric" aria-label="Wall length in millimetres">
+                        </label>
+                        <button class="finish-room-button" id="finish-room" type="button" hidden>Finish room</button>
+                    </div>
+                    <div class="zoom-controls" aria-label="Canvas zoom controls">
+                        <button class="icon-button" id="zoom-out" type="button" aria-label="Zoom out" title="Zoom out">−</button>
+                        <span id="zoom-value">100%</span>
+                        <button class="icon-button" id="zoom-in" type="button" aria-label="Zoom in" title="Zoom in">+</button>
+                        <span class="zoom-divider"></span>
+                        <button class="fit-button" id="fit-view" type="button">Fit</button>
+                    </div>
+                    <div class="empty-state" id="empty-state" aria-hidden="true"><span class="empty-cross">+</span><span>Start with a wall</span></div>
+                </div>
+                <footer class="statusbar">
+                    <div><span class="status-item" id="tool-status">Select tool</span><span class="status-separator"></span><span class="status-item" id="snap-status">Snap 1 mm from 0,0</span></div>
+                    <span id="entity-count">0 objects</span>
+                </footer>
+            </section>
+
+            <aside class="inspector" aria-label="Properties and project settings">
+                <section class="inspector-section">
+                    <div class="section-heading"><span>PROPERTIES</span><span class="rail-index">02</span></div>
+                    <div id="properties">
+                        <p class="empty-properties">Select an object to edit its dimensions and properties.</p>
+                    </div>
+                    <div class="transform-panel" id="transform-panel" hidden>
+                        <div class="section-heading"><span>TRANSFORM</span></div>
+                        <div class="position-grid">
+                            <label class="property-field">X center (mm)<input id="position-x" type="number" step="1"></label>
+                            <label class="property-field">Y center (mm)<input id="position-y" type="number" step="1"></label>
+                        </div>
+                        <button class="secondary-button full-button" id="apply-position" type="button">Move to position</button>
+                        <label class="copy-toggle"><input id="keep-original" type="checkbox"><span>Keep original when transforming</span></label>
+                        <div class="transform-row">
+                            <button class="secondary-button" id="rotate-left" type="button" title="Rotate 90 degrees counterclockwise">Rotate −90°</button>
+                            <button class="secondary-button" id="rotate-right" type="button" title="Rotate 90 degrees clockwise">Rotate +90°</button>
+                        </div>
+                        <label class="property-field scale-field">Scale (%)<input id="scale-percent" type="number" min="1" max="1000" step="1" value="100"></label>
+                        <button class="secondary-button full-button" id="apply-scale" type="button">Apply scale</button>
+                        <button class="secondary-button full-button duplicate-button" id="copy-object" type="button">Copy object</button>
+                        <div class="transform-row mirror-row">
+                            <button class="secondary-button" id="mirror-horizontal" type="button" title="Mirror across the horizontal center axis">Mirror H</button>
+                            <button class="secondary-button" id="mirror-vertical" type="button" title="Mirror across the vertical center axis">Mirror V</button>
+                        </div>
+                    </div>
+                </section>
+                <section class="inspector-section layers-section" aria-label="Layers">
+                    <div class="section-heading"><span>LAYERS</span><span class="rail-index" id="layer-count">01</span></div>
+                    <div class="layer-list" id="layer-list" role="group" aria-label="Drawing layers"></div>
+                    <button class="secondary-button full-button" id="add-layer" type="button">+ Add layer</button>
+                    <button class="secondary-button full-button layer-assign-button" id="assign-layer" type="button" disabled>Move selection to active layer</button>
+                </section>
+                <section class="inspector-section project-note">
+                    <div class="section-heading"><span>PROJECT FILE</span></div>
+                    <p>Download a <strong>.plan.json</strong> file to keep an editable copy of your drawing.</p>
+                </section>
+                <div class="inspector-footer"><span class="status-dot"></span><span>Browser-based · no account</span></div>
+            </aside>
+        </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <section id="print-sheet" aria-hidden="true">
+        <header class="print-heading">
+            <div><span>ATELIER PLAN</span>
+                <h1 id="print-title">Untitled plan</h1>
+            </div>
+            <p>FLOOR PLAN<br><span id="print-date"></span></p>
+        </header>
+        <svg id="print-drawing" xmlns="http://www.w3.org/2000/svg" viewBox="-500 -350 7000 4800"><g id="print-entities"></g></svg>
+        <footer class="print-footer"><span>Dimensions in metres unless noted</span><span>Fit to page · Not to scale</span></footer>
+    </section>
+</body>
+
+</html>
