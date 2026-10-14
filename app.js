@@ -19,7 +19,7 @@ let activeTool = 'select';
 let gridSize = DEFAULT_GRID;
 let snapEnabled = true;
 let objectSnapEnabled = true;
-let orthogonalWalls = false;
+let orthogonalWalls = true;
 let lastObjectSnap = null;
 let view = { x: -500, y: -350, width: 7000, height: 4800 };
 let gesture = null;
@@ -150,6 +150,53 @@ function polygonArea(points) {
         const next = points[(index + 1) % points.length];
         return sum + point.x * next.y - next.x * point.y;
     }, 0) / 2);
+}
+
+function roomArea(points) {
+    const walls = project.entities.filter(entity => entity.type === 'wall' && entityLayerVisible(entity));
+    if (walls.length < points.length) return polygonArea(points);
+
+    const boundaryWalls = points.map((point, index) => {
+        const next = points[(index + 1) % points.length];
+        const edge = { x: next.x - point.x, y: next.y - point.y };
+        const edgeLength = Math.hypot(edge.x, edge.y);
+        if (edgeLength < 1) return null;
+        const midpoint = { x: (point.x + next.x) / 2, y: (point.y + next.y) / 2 };
+        let nearest = null;
+
+        for (const wall of walls) {
+            const wallStart = { x: wall.x1, y: wall.y1 };
+            const wallEnd = { x: wall.x2, y: wall.y2 };
+            const wallLength = distance(wallStart, wallEnd);
+            if (wallLength < 1 || Math.abs((edge.x * (wall.y2 - wall.y1) - edge.y * (wall.x2 - wall.x1)) / (edgeLength * wallLength)) > 0.05) continue;
+            const separation = distanceToSegment(midpoint, wallStart, wallEnd);
+            if (separation <= wall.thickness / 2 + 2 && (!nearest || separation < nearest.separation)) nearest = { wall, separation };
+        }
+
+        return nearest && nearest.wall;
+    });
+
+    if (boundaryWalls.some(wall => !wall)) return polygonArea(points);
+
+    const centerlinePoints = points.map((point, index) => {
+        const previousWall = boundaryWalls[(index + points.length - 1) % points.length];
+        const nextWall = boundaryWalls[index];
+        const previous = { x: previousWall.x1, y: previousWall.y1 };
+        const previousDirection = { x: previousWall.x2 - previousWall.x1, y: previousWall.y2 - previousWall.y1 };
+        const current = { x: nextWall.x1, y: nextWall.y1 };
+        const currentDirection = { x: nextWall.x2 - nextWall.x1, y: nextWall.y2 - nextWall.y1 };
+        const determinant = previousDirection.x * currentDirection.y - previousDirection.y * currentDirection.x;
+        if (Math.abs(determinant) < 1) return point;
+
+        const difference = { x: current.x - previous.x, y: current.y - previous.y };
+        const parameter = (difference.x * currentDirection.y - difference.y * currentDirection.x) / determinant;
+        return {
+            x: previous.x + parameter * previousDirection.x,
+            y: previous.y + parameter * previousDirection.y,
+        };
+    });
+
+    return polygonArea(centerlinePoints);
 }
 
 function pointOnWall(wall, offset) {
@@ -390,7 +437,7 @@ function addEntity(parent, entity) {
         group.append(svgElement('polygon', { points, class: 'room-shape' }));
         const center = entity.points.reduce((sum, point) => ({ x: sum.x + point.x / entity.points.length, y: sum.y + point.y / entity.points.length }), { x: 0, y: 0 });
         addText(group, entity.name || 'Room', center.x, center.y - 24, 'room-name', { 'text-anchor': 'middle' });
-        addText(group, `${(polygonArea(entity.points) / 1_000_000).toFixed(1)} m²`, center.x, center.y + 120, 'room-area', { 'text-anchor': 'middle' });
+        addText(group, `${(roomArea(entity.points) / 1_000_000).toFixed(1)} m²`, center.x, center.y + 120, 'room-area', { 'text-anchor': 'middle' });
     }
 
     if (entity.type === 'dimension') {
@@ -465,7 +512,7 @@ function updateStatus() {
         wall: gesture ? `${orthogonalWalls ? '90° constrained · ' : ''}Enter a length and press Enter, or click an end point` : `${orthogonalWalls ? '90° walls · ' : ''}Click a start point, then enter a length or click the end point`,
         door: 'Click near a wall to place a door',
         window: 'Click near a wall to place a window',
-        room: gesture && gesture.points ? `${gesture.points.length} corner${gesture.points.length === 1 ? '' : 's'} placed · add at least 3, then finish` : 'Click room corners, then choose Finish room or double-click',
+        room: gesture && gesture.points ? `${gesture.points.length} corner${gesture.points.length === 1 ? '' : 's'} placed · add at least 3, then finish` : 'Click inside wall faces at room corners; finish with the button, Enter, or double-click',
         dimension: gesture ? 'Click the second point to finish the dimension' : 'Click the two points to measure',
         text: 'Click where the text should start, then edit it in Properties',
     };
@@ -488,7 +535,15 @@ function entitySnapAnchors(entity) {
         { ...entity.b, kind: 'endpoint' },
         { ...entityCenter(entity), kind: 'midpoint' },
     ];
-    if (entity.type === 'opening') return [{ ...entityCenter(entity), kind: 'opening' }];
+    if (entity.type === 'opening') {
+        const wall = currentWall(entity);
+        if (!wall) return [];
+        return [
+            { ...pointOnWall(wall, entity.offset - entity.width / 2), kind: 'opening edge' },
+            { ...pointOnWall(wall, entity.offset + entity.width / 2), kind: 'opening edge' },
+            { ...entityCenter(entity), kind: 'opening' },
+        ];
+    }
     if (entity.type === 'text') return [{ x: entity.x, y: entity.y, kind: 'text' }];
     return [];
 }
@@ -1174,7 +1229,7 @@ function updateProperties() {
         fields.push({ label: 'Position (mm)', value: Math.round(entity.offset), key: 'offset' });
     } else if (entity.type === 'room') {
         fields.push({ label: 'Room name', value: entity.name, key: 'name', text: true });
-        fields.push({ label: 'Area', value: `${(polygonArea(entity.points) / 1_000_000).toFixed(2)} m²`, readonly: true });
+        fields.push({ label: 'Area', value: `${(roomArea(entity.points) / 1_000_000).toFixed(2)} m²`, readonly: true });
     } else if (entity.type === 'dimension') {
         fields.push({ label: 'Measured length', value: formatLength(distance(entity.a, entity.b)), readonly: true });
     } else if (entity.type === 'text') {

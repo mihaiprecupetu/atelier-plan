@@ -18,8 +18,8 @@ The app is a static browser project with no package installation. Open `index.ht
 ## Verification Checklist
 
 1. Open the page and check that the canvas, toolbar, inspector, and responsive layout render without console errors.
-2. Draw a wall, adjust its length and thickness, add a door/window, and confirm that openings remain attached when the wall moves.
-3. Draw a room and finish it with the button, double-click, and Enter; verify room area against a hand calculation.
+2. Draw a wall, adjust its length and thickness, add a door/window, confirm that openings remain attached when the wall moves, and dimension between opening jambs to verify the exact clear width.
+3. Draw a room along the inside wall faces and finish it with the button, double-click, and Enter; verify a 4,000 × 4,000 mm room reports 16.00 m².
 4. Click wall faces away from their centerlines, dimension annotations, opening symbols, room fill, and text; confirm visible surfaces select.
 5. Test left-to-right and right-to-left area selection, Shift/Ctrl/Command-click multi-selection, additive marquee selection, group drag, and group delete; confirm selected wall openings remain valid.
 6. Add/edit text and exercise precise move, rotate, scale, duplicate, mirror with/without copy, and undo/redo. Confirm imports preserve all entity types.

@@ -454,7 +454,7 @@
     
     .opening-cut {
         stroke: var(--canvas);
-        stroke-linecap: square;
+        stroke-linecap: butt;
         pointer-events: none;
     }
     
